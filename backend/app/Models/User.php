@@ -18,6 +18,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
+        'ban_reason',
+        'banned_at',
         'phone',
         'avatar',
         'company_name',
@@ -30,6 +33,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'banned_at' => 'datetime',
         'password' => 'hashed',
     ];
 

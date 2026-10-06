@@ -1,7 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, Calendar, Video, Eye, HelpCircle, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Send, Video, Eye, HelpCircle, CheckCircle2, AlertCircle } from 'lucide-react';
+import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/client';
+
+const inquirySchema = Yup.object().shape({
+  student_name: Yup.string()
+    .trim()
+    .required('Full name is required')
+    .min(2, 'Name must be at least 2 characters'),
+  phone: Yup.string()
+    .trim()
+    .required('Phone number is required')
+    .matches(/^[+]?[\d\s\-().]{7,20}$/, 'Please enter a valid phone number (min 7 digits)'),
+  email: Yup.string()
+    .trim()
+    .required('Email address is required')
+    .email('Please enter a valid email address'),
+  message: Yup.string()
+    .trim()
+    .required('Message is required')
+    .min(5, 'Message must be at least 5 characters'),
+  preferred_move_in: Yup.string().nullable(),
+});
 
 export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
   const { user } = useAuth();
@@ -15,6 +36,7 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
     message: '',
   });
 
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -28,15 +50,43 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
         phone: user.phone || '',
       }));
     }
+    setErrors({});
   }, [user, isOpen]);
 
   if (!isOpen || !property) return null;
 
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setErrorMessage('');
 
+    try {
+      await inquirySchema.validate(formData, { abortEarly: false });
+      setErrors({});
+    } catch (validationErr) {
+      if (validationErr.inner) {
+        const fieldErrors = {};
+        validationErr.inner.forEach((err) => {
+          if (!fieldErrors[err.path]) {
+            fieldErrors[err.path] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+      }
+      return;
+    }
+
+    setSubmitting(true);
     try {
       await apiClient(`/properties/${property.id}/inquiries`, {
         body: formData,
@@ -91,7 +141,7 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {errorMessage && (
               <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -107,7 +157,7 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, inquiry_type: 'physical_tour' })}
+                  onClick={() => handleChange('inquiry_type', 'physical_tour')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition ${
                     formData.inquiry_type === 'physical_tour'
                       ? 'border-teal-600 bg-teal-50 text-teal-800 ring-2 ring-teal-500/20'
@@ -120,10 +170,10 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
 
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, inquiry_type: 'virtual_tour' })}
+                  onClick={() => handleChange('inquiry_type', 'virtual_tour')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition ${
                     formData.inquiry_type === 'virtual_tour'
-                      ? 'border-teal-600 bg-teal-50 text-teal-800 ring-2 ring-teal-500/20'
+                      ? 'border-teal-600 bg-teal-800 ring-2 ring-teal-500/20 bg-teal-50'
                       : 'border-slate-200 hover:bg-slate-50 text-slate-600'
                   }`}
                 >
@@ -133,7 +183,7 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
 
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, inquiry_type: 'general' })}
+                  onClick={() => handleChange('inquiry_type', 'general')}
                   className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition ${
                     formData.inquiry_type === 'general'
                       ? 'border-teal-600 bg-teal-50 text-teal-800 ring-2 ring-teal-500/20'
@@ -154,12 +204,21 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="Ali Ahmed"
                   value={formData.student_name}
-                  onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
-                  className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500 transition"
+                  onChange={(e) => handleChange('student_name', e.target.value)}
+                  className={`w-full text-sm rounded-xl border bg-slate-50 px-3 py-2 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                    errors.student_name
+                      ? 'border-rose-400 focus:ring-rose-400/30'
+                      : 'border-slate-200 focus:bg-white focus:ring-teal-500'
+                  }`}
                 />
+                {errors.student_name && (
+                  <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {errors.student_name}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -168,12 +227,21 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
                 </label>
                 <input
                   type="tel"
-                  required
                   placeholder="+44 7700 123456"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500 transition"
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                  className={`w-full text-sm rounded-xl border bg-slate-50 px-3 py-2 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                    errors.phone
+                      ? 'border-rose-400 focus:ring-rose-400/30'
+                      : 'border-slate-200 focus:bg-white focus:ring-teal-500'
+                  }`}
                 />
+                {errors.phone && (
+                  <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {errors.phone}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -185,12 +253,21 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
                 </label>
                 <input
                   type="email"
-                  required
                   placeholder="student@oxford.ac.uk"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500 transition"
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  className={`w-full text-sm rounded-xl border bg-slate-50 px-3 py-2 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                    errors.email
+                      ? 'border-rose-400 focus:ring-rose-400/30'
+                      : 'border-slate-200 focus:bg-white focus:ring-teal-500'
+                  }`}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -200,8 +277,8 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
                 <input
                   type="date"
                   value={formData.preferred_move_in}
-                  onChange={(e) => setFormData({ ...formData, preferred_move_in: e.target.value })}
-                  className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500 transition"
+                  onChange={(e) => handleChange('preferred_move_in', e.target.value)}
+                  className="w-full text-sm rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500 transition"
                 />
               </div>
             </div>
@@ -212,13 +289,22 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
                 Your Message *
               </label>
               <textarea
-                required
                 rows="3"
                 placeholder="Hi! I am interested in this room for the upcoming term. Is it still available to view this week?"
                 value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500 transition"
+                onChange={(e) => handleChange('message', e.target.value)}
+                className={`w-full text-sm rounded-xl border bg-slate-50 p-3 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                  errors.message
+                    ? 'border-rose-400 focus:ring-rose-400/30'
+                    : 'border-slate-200 focus:bg-white focus:ring-teal-500'
+                }`}
               ></textarea>
+              {errors.message && (
+                <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {errors.message}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -226,7 +312,7 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-lg shadow-teal-600/20 flex items-center justify-center gap-2 transition"
+                className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-lg shadow-teal-600/20 flex items-center justify-center gap-2 transition disabled:opacity-60"
               >
                 <Send className="w-4 h-4" />
                 {submitting ? 'Forwarding Inquiry...' : 'Send Inquiry to Landlord'}
@@ -242,4 +328,3 @@ export default function InquiryModal({ property, isOpen, onClose, onSuccess }) {
     </div>
   );
 }
-

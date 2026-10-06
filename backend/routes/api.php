@@ -64,5 +64,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('/properties/{id}/feature', [AdminController::class, 'toggleFeature']);
         Route::patch('/properties/{id}/visibility', [AdminController::class, 'updateVisibility']);
         Route::get('/users', [AdminController::class, 'users']);
+        Route::post('/users', [AdminController::class, 'createUser']);
+        Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
     });
 });

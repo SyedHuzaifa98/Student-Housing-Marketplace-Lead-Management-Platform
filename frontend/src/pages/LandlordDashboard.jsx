@@ -20,9 +20,76 @@ import {
   Phone,
   Mail,
   ExternalLink,
+  MapPin,
 } from 'lucide-react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import LocationPickerMap from '../components/LocationPickerMap';
+import * as Yup from 'yup';
+
+const propertySchema = Yup.object().shape({
+  title: Yup.string()
+    .trim()
+    .required('Listing title is required')
+    .min(5, 'Listing title must be at least 5 characters')
+    .max(150, 'Listing title cannot exceed 150 characters'),
+  university_id: Yup.mixed()
+    .required('Please select an affiliated university')
+    .test('is-valid-uni', 'Please select an affiliated university', (val) => Boolean(val && String(val).trim() !== '')),
+  room_type: Yup.string()
+    .required('Room type is required')
+    .oneOf(['private', 'studio', 'shared', 'entire_flat'], 'Invalid room type'),
+  price_per_month: Yup.number()
+    .typeError('Monthly rent must be a valid number')
+    .required('Monthly rent is required')
+    .positive('Rent must be greater than 0')
+    .max(50000, 'Rent cannot exceed $50,000/mo'),
+  deposit_amount: Yup.number()
+    .typeError('Deposit must be a valid number')
+    .nullable()
+    .transform((val, orig) => (orig === '' || orig === null || orig === undefined ? null : val))
+    .min(0, 'Deposit cannot be negative'),
+  distance_km: Yup.number()
+    .typeError('Distance must be a valid number')
+    .required('Distance to campus is required')
+    .min(0, 'Distance cannot be negative')
+    .max(100, 'Distance must be between 0 and 100 km'),
+  address: Yup.string()
+    .trim()
+    .required('Street address is required')
+    .min(3, 'Address must be at least 3 characters'),
+  city: Yup.string()
+    .trim()
+    .required('City is required')
+    .min(2, 'City must be at least 2 characters'),
+  latitude: Yup.number()
+    .typeError('Latitude must be a valid number')
+    .nullable()
+    .transform((val, orig) => (orig === '' || orig === null || orig === undefined ? null : val))
+    .min(-90, 'Latitude must be between -90 and 90')
+    .max(90, 'Latitude must be between -90 and 90'),
+  longitude: Yup.number()
+    .typeError('Longitude must be a valid number')
+    .nullable()
+    .transform((val, orig) => (orig === '' || orig === null || orig === undefined ? null : val))
+    .min(-180, 'Longitude must be between -180 and 180')
+    .max(180, 'Longitude must be between -180 and 180'),
+  description: Yup.string()
+    .trim()
+    .required('Description is required')
+    .min(10, 'Description must be at least 10 characters'),
+  images: Yup.array().of(
+    Yup.string().test('is-url', 'Please enter a valid photo URL (starting with http:// or https://)', (val) => {
+      if (!val || val.trim() === '') return true;
+      try {
+        new URL(val);
+        return true;
+      } catch {
+        return false;
+      }
+    })
+  ),
+});
 
 export default function LandlordDashboard() {
   const { user } = useAuth();
@@ -58,6 +125,8 @@ export default function LandlordDashboard() {
     distance_km: '',
     address: '',
     city: '',
+    latitude: '',
+    longitude: '',
     bills_included: true,
     available_from: new Date().toISOString().split('T')[0],
     status: 'available',
@@ -65,6 +134,7 @@ export default function LandlordDashboard() {
     amenities: [],
     images: [''],
   });
+  const [propertyErrors, setPropertyErrors] = useState({});
   const [savingProperty, setSavingProperty] = useState(false);
 
   // Load Dashboard Data
@@ -186,6 +256,7 @@ export default function LandlordDashboard() {
 
   // Property Modal Open (Create or Edit)
   const openPropertyModal = (prop = null) => {
+    setPropertyErrors({});
     if (prop) {
       setEditingProperty(prop);
       setPropertyForm({
@@ -198,6 +269,8 @@ export default function LandlordDashboard() {
         distance_km: prop.distance_km || '',
         address: prop.address || '',
         city: prop.city || '',
+        latitude: prop.latitude ?? '',
+        longitude: prop.longitude ?? '',
         bills_included: !!prop.bills_included,
         available_from: prop.available_from || new Date().toISOString().split('T')[0],
         status: prop.status || 'available',
@@ -209,9 +282,10 @@ export default function LandlordDashboard() {
             : [''],
       });
     } else {
+      const defaultUni = meta?.universities?.[0];
       setEditingProperty(null);
       setPropertyForm({
-        university_id: meta?.universities?.[0]?.id || '',
+        university_id: defaultUni?.id || '',
         title: '',
         description: '',
         price_per_month: '',
@@ -219,7 +293,9 @@ export default function LandlordDashboard() {
         room_type: 'private',
         distance_km: '0.8',
         address: '',
-        city: 'Oxford',
+        city: defaultUni?.city || 'Oxford',
+        latitude: defaultUni?.latitude ? parseFloat(defaultUni.latitude) : '',
+        longitude: defaultUni?.longitude ? parseFloat(defaultUni.longitude) : '',
         bills_included: true,
         available_from: new Date().toISOString().split('T')[0],
         status: 'available',
@@ -231,18 +307,58 @@ export default function LandlordDashboard() {
     setPropertyModalOpen(true);
   };
 
+  const handlePropertyFieldChange = (field, value) => {
+    setPropertyForm((prev) => ({ ...prev, [field]: value }));
+    if (propertyErrors[field]) {
+      setPropertyErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
   const handleSaveProperty = async (e) => {
     e.preventDefault();
+    setPropertyErrors({});
+
+    try {
+      await propertySchema.validate(propertyForm, { abortEarly: false });
+    } catch (validationErr) {
+      if (validationErr.inner) {
+        const fieldErrors = {};
+        validationErr.inner.forEach((err) => {
+          if (!fieldErrors[err.path]) {
+            fieldErrors[err.path] = err.message;
+          }
+        });
+        setPropertyErrors(fieldErrors);
+      }
+      return;
+    }
+
     setSavingProperty(true);
     try {
+      const payload = {
+        ...propertyForm,
+        latitude:
+          propertyForm.latitude !== '' && propertyForm.latitude !== null && propertyForm.latitude !== undefined
+            ? parseFloat(propertyForm.latitude)
+            : null,
+        longitude:
+          propertyForm.longitude !== '' && propertyForm.longitude !== null && propertyForm.longitude !== undefined
+            ? parseFloat(propertyForm.longitude)
+            : null,
+      };
+
       if (editingProperty) {
         await apiClient(`/landlord/properties/${editingProperty.id}`, {
           method: 'PUT',
-          body: propertyForm,
+          body: payload,
         });
       } else {
         await apiClient('/landlord/properties', {
-          body: propertyForm,
+          body: payload,
         });
       }
       setPropertyModalOpen(false);
@@ -634,9 +750,16 @@ export default function LandlordDashboard() {
 
                 <div className="p-5 flex flex-col flex-1">
                   <h4 className="font-bold text-slate-900 text-base line-clamp-1">{prop.title}</h4>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {prop.address}, {prop.city} &bull; {prop.distance_km} km to campus
-                  </p>
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <p className="text-xs text-slate-500 truncate">
+                      {prop.address}, {prop.city} &bull; {prop.distance_km} km
+                    </p>
+                    {prop.latitude && prop.longitude && (
+                      <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200 flex items-center gap-1 shrink-0" title="Location coordinates recorded">
+                        <MapPin className="w-2.5 h-2.5 text-teal-600" /> Pin Set
+                      </span>
+                    )}
+                  </div>
 
                   <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                     <div>
@@ -747,18 +870,27 @@ export default function LandlordDashboard() {
               {editingProperty ? 'Edit Accommodation Listing' : 'List New Student Property'}
             </h2>
 
-            <form onSubmit={handleSaveProperty} className="mt-6 space-y-4">
+            <form onSubmit={handleSaveProperty} noValidate className="mt-6 space-y-4">
               {/* Title */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Listing Title *</label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. St Giles Premium Ensuite Room near Oxford"
                   value={propertyForm.title}
-                  onChange={(e) => setPropertyForm({ ...propertyForm, title: e.target.value })}
-                  className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500"
+                  onChange={(e) => handlePropertyFieldChange('title', e.target.value)}
+                  className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                    propertyErrors.title
+                      ? 'border-rose-400 focus:ring-rose-400/30'
+                      : 'border-slate-200 focus:bg-white focus:ring-teal-500'
+                  }`}
                 />
+                {propertyErrors.title && (
+                  <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {propertyErrors.title}
+                  </p>
+                )}
               </div>
 
               {/* University & Room Type */}
@@ -767,50 +899,74 @@ export default function LandlordDashboard() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">University *</label>
                   <select
                     value={propertyForm.university_id}
-                    onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, university_id: e.target.value })
-                    }
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('university_id', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.university_id
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   >
+                    <option value="">Select University</option>
                     {meta?.universities?.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.name}
                       </option>
                     ))}
                   </select>
+                  {propertyErrors.university_id && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.university_id}
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Room Type *</label>
                   <select
                     value={propertyForm.room_type}
-                    onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, room_type: e.target.value })
-                    }
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('room_type', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.room_type
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   >
                     <option value="private">Private Room</option>
                     <option value="studio">Studio Apartment</option>
                     <option value="shared">Shared Room</option>
                     <option value="entire_flat">Entire Flat</option>
                   </select>
+                  {propertyErrors.room_type && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.room_type}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Price & Deposit */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Price, Deposit & Distance */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Rent / Mo ($) *</label>
                   <input
                     type="number"
-                    required
                     placeholder="450"
                     value={propertyForm.price_per_month}
-                    onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, price_per_month: e.target.value })
-                    }
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('price_per_month', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.price_per_month
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   />
+                  {propertyErrors.price_per_month && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.price_per_month}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -819,11 +975,19 @@ export default function LandlordDashboard() {
                     type="number"
                     placeholder="450"
                     value={propertyForm.deposit_amount}
-                    onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, deposit_amount: e.target.value })
-                    }
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('deposit_amount', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.deposit_amount
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   />
+                  {propertyErrors.deposit_amount && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.deposit_amount}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -831,14 +995,21 @@ export default function LandlordDashboard() {
                   <input
                     type="number"
                     step="0.1"
-                    required
                     placeholder="0.5"
                     value={propertyForm.distance_km}
-                    onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, distance_km: e.target.value })
-                    }
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('distance_km', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.distance_km
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   />
+                  {propertyErrors.distance_km && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.distance_km}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -848,25 +1019,110 @@ export default function LandlordDashboard() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">Street Address *</label>
                   <input
                     type="text"
-                    required
                     placeholder="34 St Giles"
                     value={propertyForm.address}
-                    onChange={(e) => setPropertyForm({ ...propertyForm, address: e.target.value })}
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('address', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.address
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   />
+                  {propertyErrors.address && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.address}
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">City *</label>
                   <input
                     type="text"
-                    required
                     placeholder="Oxford"
                     value={propertyForm.city}
-                    onChange={(e) => setPropertyForm({ ...propertyForm, city: e.target.value })}
-                    className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                    onChange={(e) => handlePropertyFieldChange('city', e.target.value)}
+                    className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                      propertyErrors.city
+                        ? 'border-rose-400 focus:ring-rose-400/30'
+                        : 'border-slate-200 focus:ring-teal-500'
+                    }`}
                   />
+                  {propertyErrors.city && (
+                    <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {propertyErrors.city}
+                    </p>
+                  )}
                 </div>
+              </div>
+
+              {/* Interactive Location Picker Map */}
+              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-teal-600" />
+                      <span>Property Location Pin (Interactive Map)</span>
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Search address or click on the map to drop the exact location pin students will see.
+                    </p>
+                  </div>
+                  {propertyForm.latitude && propertyForm.longitude ? (
+                    <span className="self-start sm:self-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                      ✓ Pin Set
+                    </span>
+                  ) : (
+                    <span className="self-start sm:self-auto text-[10px] font-medium text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full">
+                      Optional Pin
+                    </span>
+                  )}
+                </div>
+
+                <LocationPickerMap
+                  latitude={propertyForm.latitude}
+                  longitude={propertyForm.longitude}
+                  universityLat={
+                    meta?.universities?.find((u) => String(u.id) === String(propertyForm.university_id))?.latitude
+                  }
+                  universityLng={
+                    meta?.universities?.find((u) => String(u.id) === String(propertyForm.university_id))?.longitude
+                  }
+                  defaultAddress={`${propertyForm.address || ''} ${propertyForm.city || ''}`}
+                  onChange={({ latitude, longitude }) => {
+                    handlePropertyFieldChange('latitude', latitude);
+                    handlePropertyFieldChange('longitude', longitude);
+
+                    // If university coords exist, auto-calculate distance
+                    const selectedUni = meta?.universities?.find(
+                      (u) => String(u.id) === String(propertyForm.university_id)
+                    );
+                    if (selectedUni?.latitude && selectedUni?.longitude && latitude && longitude) {
+                      const R = 6371;
+                      const dLat = (selectedUni.latitude - latitude) * (Math.PI / 180);
+                      const dLon = (selectedUni.longitude - longitude) * (Math.PI / 180);
+                      const a =
+                        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(latitude * (Math.PI / 180)) *
+                          Math.cos(selectedUni.latitude * (Math.PI / 180)) *
+                          Math.sin(dLon / 2) *
+                          Math.sin(dLon / 2);
+                      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                      const distance = Math.max(0.1, parseFloat((R * c).toFixed(1)));
+                      handlePropertyFieldChange('distance_km', distance);
+                    }
+                  }}
+                  height="220px"
+                />
+
+                {propertyErrors.latitude && (
+                  <p className="text-[11px] text-rose-600">{propertyErrors.latitude}</p>
+                )}
+                {propertyErrors.longitude && (
+                  <p className="text-[11px] text-rose-600">{propertyErrors.longitude}</p>
+                )}
               </div>
 
               {/* Description */}
@@ -874,14 +1130,21 @@ export default function LandlordDashboard() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">Description *</label>
                 <textarea
                   rows="3"
-                  required
                   placeholder="Detailed description of room, housemates, study facilities..."
                   value={propertyForm.description}
-                  onChange={(e) =>
-                    setPropertyForm({ ...propertyForm, description: e.target.value })
-                  }
-                  className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                  onChange={(e) => handlePropertyFieldChange('description', e.target.value)}
+                  className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                    propertyErrors.description
+                      ? 'border-rose-400 focus:ring-rose-400/30'
+                      : 'border-slate-200 focus:ring-teal-500'
+                  }`}
                 ></textarea>
+                {propertyErrors.description && (
+                  <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {propertyErrors.description}
+                  </p>
+                )}
               </div>
 
               {/* Image URL */}
@@ -893,9 +1156,21 @@ export default function LandlordDashboard() {
                   type="url"
                   placeholder="https://images.unsplash.com/photo-..."
                   value={propertyForm.images[0] || ''}
-                  onChange={(e) => setPropertyForm({ ...propertyForm, images: [e.target.value] })}
-                  className="w-full text-xs rounded-xl border-slate-200 bg-slate-50 p-2.5 text-slate-800"
+                  onChange={(e) => {
+                    handlePropertyFieldChange('images', [e.target.value]);
+                  }}
+                  className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
+                    propertyErrors['images[0]'] || propertyErrors.images
+                      ? 'border-rose-400 focus:ring-rose-400/30'
+                      : 'border-slate-200 focus:ring-teal-500'
+                  }`}
                 />
+                {(propertyErrors['images[0]'] || propertyErrors.images) && (
+                  <p className="mt-1 text-[11px] text-rose-600 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {propertyErrors['images[0]'] || propertyErrors.images}
+                  </p>
+                )}
               </div>
 
               {/* Toggles */}
@@ -905,7 +1180,7 @@ export default function LandlordDashboard() {
                     type="checkbox"
                     checked={propertyForm.bills_included}
                     onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, bills_included: e.target.checked })
+                      handlePropertyFieldChange('bills_included', e.target.checked)
                     }
                     className="rounded text-teal-600"
                   />
@@ -917,7 +1192,7 @@ export default function LandlordDashboard() {
                   <select
                     value={propertyForm.status}
                     onChange={(e) =>
-                      setPropertyForm({ ...propertyForm, status: e.target.value })
+                      handlePropertyFieldChange('status', e.target.value)
                     }
                     className="text-xs rounded-lg border-slate-200 bg-slate-50 px-2 py-1"
                   >
@@ -940,7 +1215,7 @@ export default function LandlordDashboard() {
                 <button
                   type="submit"
                   disabled={savingProperty}
-                  className="px-5 py-2.5 text-xs font-bold bg-teal-600 text-white rounded-xl hover:bg-teal-700 shadow-sm"
+                  className="px-5 py-2.5 text-xs font-bold bg-teal-600 text-white rounded-xl hover:bg-teal-700 shadow-sm transition disabled:opacity-60"
                 >
                   {savingProperty ? 'Saving...' : editingProperty ? 'Update Listing' : 'Publish Property'}
                 </button>

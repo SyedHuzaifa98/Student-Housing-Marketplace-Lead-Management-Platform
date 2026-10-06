@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Components
@@ -15,6 +15,7 @@ import LandlordDashboard from './pages/LandlordDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
+import AdminLoginPage from './pages/AdminLoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 // Route Guards requiring explicit authentication
@@ -69,81 +70,94 @@ const AdminRoute = ({ children }) => {
   }
 
   if (!user || user.role !== 'admin') {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return children;
 };
+
+function AppLayout() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  return (
+    <div className={`min-h-screen flex flex-col ${isAdminRoute ? 'bg-slate-100' : 'bg-white text-slate-800 font-sans'}`}>
+      {/* Show public Navbar only on non-admin routes */}
+      {!isAdminRoute && <Navbar />}
+
+      {/* Main Route Content */}
+      <main className="flex-1 flex flex-col">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/properties" element={<PropertiesPage />} />
+          <Route path="/properties/:identifier" element={<PropertyDetailPage />} />
+
+          {/* Student Routes */}
+          <Route
+            path="/student/inquiries"
+            element={
+              <StudentRoute>
+                <StudentDashboard />
+              </StudentRoute>
+            }
+          />
+          <Route
+            path="/student/saved"
+            element={
+              <StudentRoute>
+                <StudentDashboard />
+              </StudentRoute>
+            }
+          />
+
+          {/* Landlord CRM & Listings */}
+          <Route
+            path="/landlord/dashboard"
+            element={
+              <LandlordRoute>
+                <LandlordDashboard />
+              </LandlordRoute>
+            }
+          />
+
+          {/* Admin Routes with dedicated SaaS shell */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/admin/users" element={<Navigate to="/admin/dashboard?tab=users" replace />} />
+          <Route path="/admin/properties" element={<Navigate to="/admin/dashboard?tab=properties" replace />} />
+
+          {/* Redirect api-docs */}
+          <Route path="/api-docs" element={<Navigate to="/" replace />} />
+
+          {/* Auth */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      {/* Show public Footer only on non-admin routes */}
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+}
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <BrowserRouter>
-          <div className="min-h-screen flex flex-col bg-white text-slate-800 font-sans">
-            {/* Main Navigation Header */}
-            <Navbar />
-
-            {/* Main Route Content */}
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/properties" element={<PropertiesPage />} />
-                <Route path="/properties/:identifier" element={<PropertyDetailPage />} />
-
-                {/* Student Routes */}
-                <Route
-                  path="/student/inquiries"
-                  element={
-                    <StudentRoute>
-                      <StudentDashboard />
-                    </StudentRoute>
-                  }
-                />
-                <Route
-                  path="/student/saved"
-                  element={
-                    <StudentRoute>
-                      <StudentDashboard />
-                    </StudentRoute>
-                  }
-                />
-
-                {/* Landlord CRM & Listings */}
-                <Route
-                  path="/landlord/dashboard"
-                  element={
-                    <LandlordRoute>
-                      <LandlordDashboard />
-                    </LandlordRoute>
-                  }
-                />
-
-                {/* Admin Console */}
-                <Route
-                  path="/admin/dashboard"
-                  element={
-                    <AdminRoute>
-                      <AdminDashboard />
-                    </AdminRoute>
-                  }
-                />
-
-                {/* Redirect api-docs */}
-                <Route path="/api-docs" element={<Navigate to="/" replace />} />
-
-                {/* Auth */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-
-                {/* Catch all */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-
-            {/* Footer */}
-            <Footer />
-          </div>
+          <AppLayout />
         </BrowserRouter>
       </AuthProvider>
     </ErrorBoundary>

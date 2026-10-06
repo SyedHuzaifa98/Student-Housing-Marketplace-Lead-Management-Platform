@@ -55,6 +55,18 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($user->status === 'banned') {
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been suspended/banned. ' . ($user->ban_reason ? 'Reason: ' . $user->ban_reason : 'Please contact administrator support.')],
+            ]);
+        }
+
+        if ($user->status === 'deactivated') {
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been deactivated. Please contact administrator support.'],
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

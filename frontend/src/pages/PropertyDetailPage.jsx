@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Bed,
   Eye,
+  ExternalLink,
 } from 'lucide-react';
 import apiClient from '../api/client';
 import InquiryModal from '../components/InquiryModal';
@@ -254,18 +255,30 @@ export default function PropertyDetailPage() {
           {/* Location Map */}
           {property.latitude && property.longitude && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">Location & Proximity</h3>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {property.address}, {property.city}
                   </p>
                 </div>
-                {property.university && (
-                  <span className="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full">
-                    {property.distance_km} km to campus
-                  </span>
-                )}
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  {property.university && (
+                    <span className="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+                      {property.distance_km} km to campus
+                    </span>
+                  )}
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${property.latitude},${property.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-3 py-1 rounded-full border border-teal-200 transition"
+                    title="Open in Maps for Directions"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>Get Directions</span>
+                  </a>
+                </div>
               </div>
               <PropertyMap properties={[property]} height="320px" />
             </div>

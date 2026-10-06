@@ -68,8 +68,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/dashboard" className="hover:text-white transition">
-                  Admin Oversight Panel
+                <Link to="/admin/login" className="hover:text-white transition">
+                  Staff & Admin Portal
                 </Link>
               </li>
               <li>
