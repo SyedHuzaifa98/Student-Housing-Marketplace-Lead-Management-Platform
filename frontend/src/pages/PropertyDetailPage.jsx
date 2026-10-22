@@ -158,11 +158,11 @@ export default function PropertyDetailPage() {
       q: 'Are utility bills and high-speed Wi-Fi included?',
       a: property.bills_included
         ? 'Yes! All utility bills including high-speed internet, electricity, heating, and water are included with zero unexpected bills at month-end.'
-        : 'Utilities (electricity, water, Wi-Fi) are billed separately based on actual usage, estimated at approximately $80-$130/month depending on season.',
+        : 'Utilities (electricity, water, Wi-Fi) are billed separately based on actual usage, estimated at approximately Rs. 3,000 - Rs. 6,000/month depending on season.',
     },
     {
       q: 'How is my security deposit protected?',
-      a: `Your refundable deposit of $${Math.round(property.deposit_amount || 0)} is safeguarded in a government-recognized tenancy deposit protection scheme and is returned upon lease completion.`,
+      a: `Your refundable deposit of Rs. ${Math.round(property.deposit_amount || 0).toLocaleString('en-PK')} is safeguarded in a tenancy deposit protection agreement and is returned upon lease completion.`,
     },
     {
       q: 'Can international students apply without a local guarantor?',
@@ -258,7 +258,7 @@ export default function PropertyDetailPage() {
 
           <div className="shrink-0 flex items-baseline gap-1.5 bg-slate-50 dark:bg-slate-900 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-800">
             <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
-              ${Math.round(property.price_per_month)}
+              Rs. {Math.round(property.price_per_month).toLocaleString('en-PK')}
             </span>
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400"> / month</span>
           </div>
@@ -349,7 +349,7 @@ export default function PropertyDetailPage() {
                 Security Deposit
               </span>
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1 block">
-                ${Math.round(property.deposit_amount || 0)}
+                Rs. {Math.round(property.deposit_amount || 0).toLocaleString('en-PK')}
               </span>
             </div>
 
@@ -544,13 +544,13 @@ export default function PropertyDetailPage() {
                   Verified Pricing
                 </span>
                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  $0 Student Booking Fee
+                  Rs. 0 Student Booking Fee
                 </span>
               </div>
 
               <div className="mt-3.5 flex items-baseline gap-1.5">
                 <span className="text-3xl font-black text-slate-900 dark:text-white">
-                  ${Math.round(property.price_per_month)}
+                  Rs. {Math.round(property.price_per_month).toLocaleString('en-PK')}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium"> / month</span>
               </div>
@@ -560,18 +560,18 @@ export default function PropertyDetailPage() {
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Utilities & Wi-Fi:</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    {property.bills_included ? 'All Included' : 'Excluded (~$90/mo)'}
+                    {property.bills_included ? 'All Included' : 'Excluded (~Rs. 3,500/mo)'}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Security Deposit:</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    ${Math.round(property.deposit_amount || 0)} (Refundable)
+                    Rs. {Math.round(property.deposit_amount || 0).toLocaleString('en-PK')} (Refundable)
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Service & Admin Fee:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">FREE ($0)</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">FREE (Rs. 0)</span>
                 </div>
               </div>
             </div>

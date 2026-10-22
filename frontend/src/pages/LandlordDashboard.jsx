@@ -43,7 +43,7 @@ const propertySchema = Yup.object().shape({
     .typeError('Monthly rent must be a valid number')
     .required('Monthly rent is required')
     .positive('Rent must be greater than 0')
-    .max(50000, 'Rent cannot exceed $50,000/mo'),
+    .max(2000000, 'Rent cannot exceed Rs. 2,000,000/mo'),
   deposit_amount: Yup.number()
     .typeError('Deposit must be a valid number')
     .nullable()
@@ -633,7 +633,7 @@ export default function LandlordDashboard() {
                               <span className="text-slate-400 italic">Property removed</span>
                             )}
                             <div className="text-teal-600 font-bold text-[11px] mt-0.5">
-                              ${Math.round(inq.property?.price_per_month || 0)}/mo
+                              Rs. {Math.round(inq.property?.price_per_month || 0).toLocaleString('en-PK')}/mo
                             </div>
                           </td>
 
@@ -764,7 +764,7 @@ export default function LandlordDashboard() {
                   <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                     <div>
                       <span className="text-lg font-black text-slate-900">
-                        ${Math.round(prop.price_per_month)}
+                        Rs. {Math.round(prop.price_per_month).toLocaleString('en-PK')}
                       </span>
                       <span className="text-slate-400"> / mo</span>
                     </div>
@@ -949,10 +949,10 @@ export default function LandlordDashboard() {
               {/* Price, Deposit & Distance */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Rent / Mo ($) *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Rent / Mo (PKR) *</label>
                   <input
                     type="number"
-                    placeholder="450"
+                    placeholder="14000"
                     value={propertyForm.price_per_month}
                     onChange={(e) => handlePropertyFieldChange('price_per_month', e.target.value)}
                     className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${
@@ -970,10 +970,10 @@ export default function LandlordDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Deposit ($)</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Deposit (PKR)</label>
                   <input
                     type="number"
-                    placeholder="450"
+                    placeholder="10000"
                     value={propertyForm.deposit_amount}
                     onChange={(e) => handlePropertyFieldChange('deposit_amount', e.target.value)}
                     className={`w-full text-xs rounded-xl border bg-slate-50 p-2.5 text-slate-800 transition focus:outline-none focus:ring-2 ${

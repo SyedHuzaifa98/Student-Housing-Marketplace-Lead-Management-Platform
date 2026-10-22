@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 
 class Property extends Model
@@ -105,6 +106,11 @@ class Property extends Model
     public function amenities(): BelongsToMany
     {
         return $this->belongsToMany(Amenity::class, 'property_amenity');
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
     }
 
     public function inquiries(): HasMany

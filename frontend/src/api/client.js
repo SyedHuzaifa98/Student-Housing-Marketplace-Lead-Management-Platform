@@ -2,11 +2,15 @@ const API_BASE_URL = '/api/v1';
 
 export const apiClient = async (endpoint, { body, ...customConfig } = {}) => {
   const token = localStorage.getItem('token');
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
   const headers = {
-    'Content-Type': 'application/json',
     Accept: 'application/json',
     ...customConfig.headers,
   };
+
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -19,7 +23,7 @@ export const apiClient = async (endpoint, { body, ...customConfig } = {}) => {
   };
 
   if (body) {
-    config.body = JSON.stringify(body);
+    config.body = isFormData ? body : JSON.stringify(body);
   }
 
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;

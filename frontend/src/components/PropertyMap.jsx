@@ -24,8 +24,8 @@ function MapRecenter({ properties }) {
 }
 
 export default function PropertyMap({ properties, height = '500px' }) {
-  // Default center (Oxford/UK or first property)
-  const defaultCenter = [51.7548, -1.2543];
+  // Default center (Jamshoro, Sindh)
+  const defaultCenter = [25.4190, 68.2618];
 
   const createPriceIcon = (price) => {
     return L.divIcon({
@@ -36,7 +36,7 @@ export default function PropertyMap({ properties, height = '500px' }) {
           color: white;
           font-weight: 700;
           font-size: 11px;
-          padding: 4px 8px;
+          padding: 4px 10px;
           border-radius: 9999px;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
           border: 2px solid white;
@@ -44,11 +44,11 @@ export default function PropertyMap({ properties, height = '500px' }) {
           cursor: pointer;
           transition: transform 0.2s;
         ">
-          $${Math.round(price)}/mo
+          Rs. ${Math.round(price).toLocaleString('en-PK')}/mo
         </div>
       `,
-      iconSize: [60, 24],
-      iconAnchor: [30, 12],
+      iconSize: [90, 26],
+      iconAnchor: [45, 13],
     });
   };
 

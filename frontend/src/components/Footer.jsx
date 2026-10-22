@@ -125,7 +125,7 @@ export default function Footer() {
             <span className="flex items-center gap-1 hover:text-white cursor-pointer">
               <Globe className="w-3.5 h-3.5" /> English (US)
             </span>
-            <span className="font-semibold text-white">$ USD</span>
+            <span className="font-semibold text-white">PKR (Rs.)</span>
           </div>
         </div>
       </div>

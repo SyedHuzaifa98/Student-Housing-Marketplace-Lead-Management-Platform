@@ -5,8 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -96,6 +99,29 @@ class User extends Authenticatable
     public function savedProperties(): BelongsToMany
     {
         return $this->belongsToMany(Property::class, 'saved_properties')->withTimestamps();
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function avatarFile(): MorphOne
+    {
+        return $this->morphOne(File::class, 'fileable')->where('file_type', 'avatar')->latestOfMany();
+    }
+
+    public function getAvatarAttribute($value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, 'data:')) {
+            return $value;
+        }
+
+        return Storage::disk('public')->url($value);
     }
 
     public function isLandlord(): bool

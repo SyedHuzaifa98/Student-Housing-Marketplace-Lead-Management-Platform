@@ -174,7 +174,7 @@ export default function PropertyCard({ property, onSaveToggle }) {
         <div className="mt-auto pt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
           <div>
             <span className="text-xl font-extrabold text-slate-900 dark:text-white">
-              ${Math.round(property.price_per_month)}
+              Rs. {Math.round(property.price_per_month).toLocaleString('en-PK')}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium"> / month</span>
           </div>

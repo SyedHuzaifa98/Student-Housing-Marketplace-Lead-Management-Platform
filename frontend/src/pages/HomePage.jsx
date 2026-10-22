@@ -72,8 +72,8 @@ export default function HomePage() {
             Verified Student Accommodations &bull; Direct Landlord Inquiries
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl mx-auto leading-tight">
-            Find Your Ideal Student Home{' '}
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl mx-auto leading-tight text-white">
+            <span className="text-white">Find Your Ideal Student Home</span>{' '}
             <span className="bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">
               Steps Away From Campus
             </span>
@@ -133,11 +133,11 @@ export default function HomePage() {
               <div className="w-full md:w-48 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-                  Max Budget
+                  Max Budget (PKR)
                 </label>
                 <input
                   type="number"
-                  placeholder="e.g. $500/mo"
+                  placeholder="e.g. 15,000"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   className="w-full text-sm font-semibold bg-transparent text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none"
@@ -166,7 +166,7 @@ export default function HomePage() {
               <div className="text-xs text-slate-400 mt-0.5">Walk to Campus</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-black text-teal-400">$0</div>
+              <div className="text-2xl sm:text-3xl font-black text-teal-400">Rs. 0</div>
               <div className="text-xs text-slate-400 mt-0.5">Student Booking Fees</div>
             </div>
             <div>
@@ -287,7 +287,7 @@ export default function HomePage() {
             <span className="text-xs font-bold uppercase tracking-wider text-blue-300 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-400/30">
               For Students
             </span>
-            <h3 className="text-2xl font-black mt-4">Stress-Free Student Living</h3>
+            <h3 className="text-2xl font-black mt-4 text-white">Stress-Free Student Living</h3>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed">
               Skip sketchy social media groups. Find inspected accommodations with clear pricing,
               all bills included tags, and schedule in-person or virtual viewings with 1 click.
@@ -319,7 +319,7 @@ export default function HomePage() {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-400/30">
               For Landlords & Property Managers
             </span>
-            <h3 className="text-2xl font-black mt-4">Automated Lead Management CRM</h3>
+            <h3 className="text-2xl font-black mt-4 text-white">Automated Lead Management CRM</h3>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed">
               List student properties, manage seasonal occupancy, and track prospective tenant leads
               through an integrated pipeline with WhatsApp quick-connect and CSV exports.

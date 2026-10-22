@@ -426,7 +426,7 @@ export default function AdminDashboard() {
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-900 truncate">{p.title}</p>
                           <p className="text-[11px] text-slate-500 truncate">
-                            Owner: {p.landlord?.name || 'Unknown'} • ${Math.round(p.price_per_month)}/mo
+                            Owner: {p.landlord?.name || 'Unknown'} • Rs. {Math.round(p.price_per_month).toLocaleString('en-PK')}/mo
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -842,7 +842,7 @@ export default function AdminDashboard() {
                               {prop.university?.name || 'N/A'}
                             </td>
                             <td className="py-3.5 px-4 font-black text-slate-900">
-                              ${Math.round(prop.price_per_month)}
+                              Rs. {Math.round(prop.price_per_month).toLocaleString('en-PK')}
                             </td>
                             <td className="py-3.5 px-4 text-center">
                               <button

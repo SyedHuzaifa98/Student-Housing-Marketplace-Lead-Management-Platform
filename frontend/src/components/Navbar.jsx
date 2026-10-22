@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
+import ProfileModal from './ProfileModal';
 import {
   Home,
   Search,
@@ -20,6 +21,7 @@ export default function Navbar() {
   const { user, logout, isLandlord, isStudent, isAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -169,9 +171,20 @@ export default function Navbar() {
                     <button
                       onClick={() => {
                         setDropdownOpen(false);
+                        setProfileModalOpen(true);
+                      }}
+                      className="w-full text-left flex items-center gap-2 px-4 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 border-t border-slate-100 dark:border-slate-700 transition"
+                    >
+                      <User className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                      Edit Profile
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
                         handleLogout();
                       }}
-                      className="w-full text-left flex items-center gap-2 px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700/60 border-t border-slate-100 dark:border-slate-700"
+                      className="w-full text-left flex items-center gap-2 px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700/60 border-t border-slate-100 dark:border-slate-700 transition"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
@@ -273,7 +286,16 @@ export default function Navbar() {
               </Link>
             </div>
           ) : (
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setProfileModalOpen(true);
+                }}
+                className="w-full text-left py-2 text-sm font-medium text-teal-600 dark:text-teal-400"
+              >
+                Edit Profile ({user.name})
+              </button>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -281,12 +303,18 @@ export default function Navbar() {
                 }}
                 className="w-full text-left py-2 text-sm font-medium text-rose-600 dark:text-rose-400"
               >
-                Sign Out ({user.name})
+                Sign Out
               </button>
             </div>
           )}
         </div>
       )}
+
+      {/* Profile Update Modal */}
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+      />
     </header>
   );
 }

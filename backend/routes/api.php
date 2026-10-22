@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\LandlordController;
 use App\Http\Controllers\Api\PropertyController;
@@ -22,7 +23,12 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::post('/user/profile', [AuthController::class, 'updateProfile']);
     });
+
+    // File Viewing & Streaming (MERN resolution pattern)
+    Route::get('/files/{id}', [FileController::class, 'show']);
+    Route::get('/files/{id}/base64', [FileController::class, 'base64']);
 
     // 2. Public Meta (Universities, Amenities, Filter bounds)
     Route::get('/meta', [PropertyController::class, 'meta']);

@@ -126,8 +126,8 @@ export default function PropertiesPage() {
     const uni = meta.universities.find((u) => u.id.toString() === filters.university_id);
     if (uni) activeFilters.push({ key: 'university_id', label: `Uni: ${uni.name}` });
   }
-  if (filters.min_price) activeFilters.push({ key: 'min_price', label: `Min: $${filters.min_price}` });
-  if (filters.max_price) activeFilters.push({ key: 'max_price', label: `Max: $${filters.max_price}` });
+  if (filters.min_price) activeFilters.push({ key: 'min_price', label: `Min: Rs. ${Number(filters.min_price).toLocaleString('en-PK')}` });
+  if (filters.max_price) activeFilters.push({ key: 'max_price', label: `Max: Rs. ${Number(filters.max_price).toLocaleString('en-PK')}` });
   if (filters.room_types) {
     filters.room_types.split(',').forEach((t) => {
       activeFilters.push({ key: 'room_types', subVal: t, label: `Type: ${t}` });

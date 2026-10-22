@@ -19,8 +19,8 @@ class PropertyController extends Controller
         $amenities = Amenity::all();
 
         $priceStats = [
-            'min' => (float) (Property::where('visibility', 'published')->min('price_per_month') ?? 100),
-            'max' => (float) (Property::where('visibility', 'published')->max('price_per_month') ?? 1200),
+            'min' => (float) (Property::where('visibility', 'published')->min('price_per_month') ?? 5000),
+            'max' => (float) (Property::where('visibility', 'published')->max('price_per_month') ?? 50000),
         ];
 
         return response()->json([

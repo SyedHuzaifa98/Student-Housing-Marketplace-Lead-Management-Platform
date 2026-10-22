@@ -84,16 +84,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (profileData) => {
+    const data = await apiClient('/user/profile', {
+      method: 'POST',
+      body: profileData,
+    });
+    if (data?.user) {
+      setUser(data.user);
+    }
+    return data;
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         token,
         loading,
         login,
         demoLogin,
         register,
         logout,
+        updateProfile,
         isAuthenticated: !!user,
         isStudent: user?.role === 'student',
         isLandlord: user?.role === 'landlord',

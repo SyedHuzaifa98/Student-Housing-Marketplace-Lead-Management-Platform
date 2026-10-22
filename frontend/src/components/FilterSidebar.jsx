@@ -79,26 +79,26 @@ export default function FilterSidebar({
       <div>
         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
           <DollarSign className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-          Monthly Budget ($)
+          Monthly Budget (PKR)
         </label>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Min ($)</span>
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Min (Rs.)</span>
             <input
               type="number"
               min="0"
-              placeholder="Min"
+              placeholder="e.g. 5,000"
               value={filters.min_price || ''}
               onChange={(e) => onFilterChange('min_price', e.target.value)}
               className="w-full text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500 transition"
             />
           </div>
           <div>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Max ($)</span>
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Max (Rs.)</span>
             <input
               type="number"
               min="0"
-              placeholder="Max"
+              placeholder="e.g. 35,000"
               value={filters.max_price || ''}
               onChange={(e) => onFilterChange('max_price', e.target.value)}
               className="w-full text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500 transition"

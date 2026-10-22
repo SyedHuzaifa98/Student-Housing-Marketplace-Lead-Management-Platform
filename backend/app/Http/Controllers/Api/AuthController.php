@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\LocalFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -121,6 +122,75 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out successfully',
+        ]);
+    }
+
+    public function updateProfile(Request $request, LocalFileService $fileService)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name'         => 'sometimes|required|string|max:255',
+            'phone'        => 'nullable|string|max:30',
+            'company_name' => 'nullable|string|max:255',
+            'avatar'       => 'nullable|file|mimes:jpeg,jpg,png,webp,gif|max:5120',
+            'avatar_base64'=> 'nullable|string',
+        ]);
+
+        if (isset($validated['name'])) {
+            $user->name = $validated['name'];
+        }
+        if (array_key_exists('phone', $validated)) {
+            $user->phone = $validated['phone'];
+        }
+        if (array_key_exists('company_name', $validated)) {
+            $user->company_name = $validated['company_name'];
+        }
+
+        // Handle Avatar File Upload (Multipart)
+        if ($request->hasFile('avatar')) {
+            $uploadedFile = $request->file('avatar');
+
+            // Delete previous avatar file if exists
+            $oldAvatar = $user->avatarFile;
+            if ($oldAvatar) {
+                $fileService->deleteFile($oldAvatar);
+            }
+
+            // Save new avatar using time-partitioned & entity-scoped structure
+            $fileRecord = $fileService->uploadFile(
+                uploadedFile: $uploadedFile,
+                module: 'users',
+                parentId: $user->id,
+                fileType: 'avatar',
+                fileable: $user
+            );
+
+            $user->avatar = $fileRecord->file_path;
+        } elseif ($request->filled('avatar_base64')) {
+            // Handle Base64 avatar upload (MERN-style)
+            $oldAvatar = $user->avatarFile;
+            if ($oldAvatar) {
+                $fileService->deleteFile($oldAvatar);
+            }
+
+            $fileRecord = $fileService->uploadFromBase64(
+                base64String: $request->input('avatar_base64'),
+                module: 'users',
+                parentId: $user->id,
+                fileType: 'avatar',
+                originalName: "avatar-{$user->id}.webp",
+                fileable: $user
+            );
+
+            $user->avatar = $fileRecord->file_path;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user'    => $user->fresh()->load('avatarFile'),
         ]);
     }
 }

@@ -24,19 +24,12 @@ html.dark body {
   color: #f1f5f9;
 }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-  color: #0f172a;
-  letter-spacing: -0.022em;
-}
-
-html.dark h1,
-html.dark h2,
-html.dark h3,
-html.dark h4,
-html.dark h5,
-html.dark h6 {
-  color: #f8fafc;
+@layer base {
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    color: inherit;
+    letter-spacing: -0.022em;
+  }
 }
 
 /* Custom scrollbar */
