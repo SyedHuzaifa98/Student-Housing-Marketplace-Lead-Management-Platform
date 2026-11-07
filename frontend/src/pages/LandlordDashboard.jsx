@@ -384,16 +384,16 @@ export default function LandlordDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Dashboard Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
             Landlord Operations Portal
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">
             Lead Management & Housing Dashboard
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Logged in as: <strong className="text-slate-800">{user?.name}</strong> (
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Logged in as: <strong className="text-slate-800 dark:text-slate-200">{user?.name}</strong> (
             {user?.company_name || 'Property Manager'})
           </p>
         </div>
@@ -401,7 +401,7 @@ export default function LandlordDashboard() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => openPropertyModal()}
-            className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition"
+            className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition"
           >
             <Plus className="w-4 h-4" />
             Add New Accommodation
@@ -412,70 +412,70 @@ export default function LandlordDashboard() {
       {/* KPI Stats Metrics Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Properties */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2">
             <span className="text-xs font-semibold">Properties</span>
-            <Building2 className="w-4 h-4 text-teal-600" />
+            <Building2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
           </div>
-          <div className="text-2xl font-black text-slate-900">
+          <div className="text-2xl font-black text-slate-900 dark:text-white">
             {stats?.total_properties || 0}
           </div>
-          <span className="text-[11px] text-slate-500">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">
             {stats?.active_properties || 0} currently active
           </span>
         </div>
 
         {/* Total Leads */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2">
             <span className="text-xs font-semibold">Total Leads</span>
-            <Users className="w-4 h-4 text-blue-600" />
+            <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="text-2xl font-black text-slate-900">{stats?.total_inquiries || 0}</div>
-          <span className="text-[11px] text-slate-500">All-time student inquiries</span>
+          <div className="text-2xl font-black text-slate-900 dark:text-white">{stats?.total_inquiries || 0}</div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">All-time student inquiries</span>
         </div>
 
         {/* New Leads (High attention) */}
-        <div className="bg-rose-50/80 p-5 rounded-2xl border border-rose-200/80 shadow-sm">
-          <div className="flex items-center justify-between text-rose-600 mb-2">
+        <div className="bg-rose-50/80 dark:bg-rose-950/40 p-5 rounded-2xl border border-rose-200/80 dark:border-rose-900/60 shadow-sm transition-colors">
+          <div className="flex items-center justify-between text-rose-600 dark:text-rose-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">New Leads</span>
             <Clock className="w-4 h-4" />
           </div>
-          <div className="text-2xl font-black text-rose-700">{stats?.new_leads || 0}</div>
-          <span className="text-[11px] text-rose-600 font-medium">Awaiting landlord reply</span>
+          <div className="text-2xl font-black text-rose-700 dark:text-rose-300">{stats?.new_leads || 0}</div>
+          <span className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">Awaiting landlord reply</span>
         </div>
 
         {/* Closed Deals */}
-        <div className="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200/80 shadow-sm">
-          <div className="flex items-center justify-between text-emerald-600 mb-2">
+        <div className="bg-emerald-50/80 dark:bg-emerald-950/40 p-5 rounded-2xl border border-emerald-200/80 dark:border-emerald-900/60 shadow-sm transition-colors">
+          <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Closed Deals</span>
             <CheckCircle2 className="w-4 h-4" />
           </div>
-          <div className="text-2xl font-black text-emerald-800">{stats?.closed_deals || 0}</div>
-          <span className="text-[11px] text-emerald-600 font-medium">Leases finalized</span>
+          <div className="text-2xl font-black text-emerald-800 dark:text-emerald-300">{stats?.closed_deals || 0}</div>
+          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Leases finalized</span>
         </div>
 
         {/* Lead Conversion Rate */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2">
             <span className="text-xs font-semibold">Conversion Rate</span>
-            <TrendingUp className="w-4 h-4 text-purple-600" />
+            <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
           </div>
-          <div className="text-2xl font-black text-slate-900">
+          <div className="text-2xl font-black text-slate-900 dark:text-white">
             {stats?.conversion_rate || 0}%
           </div>
-          <span className="text-[11px] text-slate-500">Closed / Inquiries</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">Closed / Inquiries</span>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-4 border-b border-slate-200">
+      <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-800">
         <button
           onClick={() => setActiveTab('crm')}
           className={`pb-3 text-sm font-bold transition border-b-2 flex items-center gap-2 ${
             activeTab === 'crm'
-              ? 'border-teal-600 text-teal-700'
-              : 'border-transparent text-slate-500 hover:text-slate-900'
+              ? 'border-teal-600 text-teal-700 dark:text-teal-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <Users className="w-4 h-4" />

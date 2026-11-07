@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Components
 import ErrorBoundary from './components/ErrorBoundary';
@@ -81,7 +82,7 @@ function AppLayout() {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <div className={`min-h-screen flex flex-col ${isAdminRoute ? 'bg-slate-100' : 'bg-white text-slate-800 font-sans'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isAdminRoute ? 'bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100' : 'bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans'}`}>
       {/* Show public Navbar only on non-admin routes */}
       {!isAdminRoute && <Navbar />}
 
@@ -155,11 +156,13 @@ function AppLayout() {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppLayout />
-        </BrowserRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <AppLayout />
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

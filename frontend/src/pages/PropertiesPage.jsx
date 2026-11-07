@@ -158,16 +158,16 @@ export default function PropertiesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Top Search & Filter Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 transition-colors duration-200">
         {/* Full-text search input */}
         <div className="relative w-full md:w-96">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Search by title, location, or street..."
             value={filters.search}
             onChange={(e) => handleFilterChange('search', e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
+            className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
           />
         </div>
 
@@ -176,34 +176,36 @@ export default function PropertiesPage() {
           {/* Mobile Filter Trigger */}
           <button
             onClick={() => setMobileFilterOpen(true)}
-            className="md:hidden flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 rounded-xl"
+            className="md:hidden flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-xl"
           >
-            <SlidersHorizontal className="w-4 h-4 text-teal-600" />
+            <SlidersHorizontal className="w-4 h-4 text-teal-600 dark:text-teal-400" />
             Filters {activeFilters.length > 0 && `(${activeFilters.length})`}
           </button>
 
           {/* Sort Dropdown */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline">Sort:</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium hidden sm:inline">Sort:</span>
             <select
               value={filters.sort}
               onChange={(e) => handleFilterChange('sort', e.target.value)}
-              className="text-xs font-semibold rounded-xl border-slate-200 bg-slate-50 px-3 py-2 text-slate-700 focus:bg-white focus:ring-2 focus:ring-teal-500"
+              className="text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-700 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500"
             >
-              <option value="featured">Featured First</option>
-              <option value="price_asc">Price: Low &rarr; High</option>
-              <option value="price_desc">Price: High &rarr; Low</option>
-              <option value="distance_asc">Distance to Campus</option>
-              <option value="newest">Newest Listed</option>
+              <option value="featured" className="dark:bg-slate-900">Featured First</option>
+              <option value="price_asc" className="dark:bg-slate-900">Price: Low &rarr; High</option>
+              <option value="price_desc" className="dark:bg-slate-900">Price: High &rarr; Low</option>
+              <option value="distance_asc" className="dark:bg-slate-900">Distance to Campus</option>
+              <option value="newest" className="dark:bg-slate-900">Newest Listed</option>
             </select>
           </div>
 
           {/* View Mode Toggle Buttons */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                viewMode === 'grid' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
               title="Grid View"
             >
@@ -212,7 +214,9 @@ export default function PropertiesPage() {
             <button
               onClick={() => setViewMode('split')}
               className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                viewMode === 'split' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'split'
+                  ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
               title="Map & Grid View"
             >
@@ -225,18 +229,18 @@ export default function PropertiesPage() {
       {/* Active Filter Pills */}
       {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
+          <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">
             Active Filters:
           </span>
           {activeFilters.map((f, i) => (
             <span
               key={i}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-800 border border-teal-200"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border border-teal-200 dark:border-teal-800"
             >
               {f.label}
               <button
                 onClick={() => removeFilterPill(f)}
-                className="hover:text-rose-600 transition"
+                className="hover:text-rose-600 dark:hover:text-rose-400 transition"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -244,7 +248,7 @@ export default function PropertiesPage() {
           ))}
           <button
             onClick={handleResetFilters}
-            className="text-xs font-bold text-slate-500 hover:text-rose-600 ml-2 underline"
+            className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 ml-2 underline"
           >
             Clear All
           </button>
@@ -267,10 +271,10 @@ export default function PropertiesPage() {
         {/* Results Area */}
         <div className="md:col-span-3 space-y-6">
           {/* Results Summary Bar */}
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
             <span>
-              Showing <strong className="text-slate-900">{properties.length}</strong> of{' '}
-              <strong className="text-slate-900">{total}</strong> available accommodations
+              Showing <strong className="text-slate-900 dark:text-white">{properties.length}</strong> of{' '}
+              <strong className="text-slate-900 dark:text-white">{total}</strong> available accommodations
             </span>
             <span>
               Page {currentPage} of {lastPage}
@@ -279,7 +283,7 @@ export default function PropertiesPage() {
 
           {/* Interactive Map (if Split View is enabled) */}
           {viewMode === 'split' && (
-            <div className="mb-6">
+            <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
               <PropertyMap properties={properties} height="360px" />
             </div>
           )}
@@ -288,7 +292,7 @@ export default function PropertiesPage() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-80 bg-slate-200 animate-pulse rounded-2xl"></div>
+                <div key={i} className="h-80 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div>
               ))}
             </div>
           ) : properties.length > 0 ? (
@@ -298,15 +302,15 @@ export default function PropertiesPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-md mx-auto">
-              <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-slate-900">No matching accommodations</h3>
-              <p className="text-xs text-slate-500 mt-1">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center max-w-md mx-auto">
+              <AlertCircle className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">No matching accommodations</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Try widening your price budget or clearing distance / amenity filters.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-5 px-4 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 shadow-sm"
+                className="mt-5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
               >
                 Reset All Filters
               </button>
@@ -319,7 +323,7 @@ export default function PropertiesPage() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage <= 1}
-                className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -331,7 +335,7 @@ export default function PropertiesPage() {
                   className={`w-9 h-9 rounded-xl text-xs font-bold transition ${
                     p === currentPage
                       ? 'bg-teal-600 text-white shadow-sm'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                      : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
                   }`}
                 >
                   {p}
@@ -341,7 +345,7 @@ export default function PropertiesPage() {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage >= lastPage}
-                className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -352,13 +356,13 @@ export default function PropertiesPage() {
 
       {/* Mobile Filter Modal */}
       {mobileFilterOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 p-4 flex flex-col justify-end md:hidden">
-          <div className="bg-white rounded-3xl p-6 max-h-[85vh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-bold text-slate-900">Filters</h3>
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm p-4 flex flex-col justify-end md:hidden">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-h-[85vh] overflow-y-auto space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="font-bold text-slate-900 dark:text-white">Filters</h3>
               <button
                 onClick={() => setMobileFilterOpen(false)}
-                className="p-1 rounded-full text-slate-400"
+                className="p-1 rounded-full text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -372,7 +376,7 @@ export default function PropertiesPage() {
             />
             <button
               onClick={() => setMobileFilterOpen(false)}
-              className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl"
+              className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl transition"
             >
               Show {total} Results
             </button>
@@ -382,4 +386,3 @@ export default function PropertiesPage() {
     </div>
   );
 }
-

@@ -38,7 +38,7 @@ class PropertyController extends Controller
 
     public function index(Request $request)
     {
-        $query = Property::with(['university', 'images', 'amenities', 'landlord:id,name,avatar,company_name'])
+        $query = Property::with(['university', 'images', 'amenities', 'landlord:id,name,avatar,company_name,last_seen_at,updated_at'])
             ->where('visibility', 'published');
 
         // Full-text search
@@ -136,7 +136,7 @@ class PropertyController extends Controller
             'university',
             'images',
             'amenities',
-            'landlord:id,name,avatar,company_name,phone,created_at',
+            'landlord:id,name,avatar,company_name,phone,created_at,last_seen_at,updated_at',
         ])
             ->where(function ($q) use ($identifier) {
                 if (is_numeric($identifier)) {

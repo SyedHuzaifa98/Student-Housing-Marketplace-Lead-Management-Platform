@@ -88,22 +88,22 @@ export default function HomePage() {
           <div className="mt-10 max-w-4xl mx-auto">
             <form
               onSubmit={handleSearch}
-              className="bg-white p-3 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 flex flex-col md:flex-row items-center gap-3 text-slate-800 text-left"
+              className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center gap-3 text-slate-800 dark:text-slate-100 text-left"
             >
               {/* University dropdown */}
-              <div className="w-full md:flex-1 p-2 rounded-xl hover:bg-slate-50 transition border border-transparent md:border-r md:border-slate-100">
+              <div className="w-full md:flex-1 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition border border-transparent md:border-r md:border-slate-100 dark:md:border-slate-800">
                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <Building className="w-3.5 h-3.5 text-teal-600" />
+                  <Building className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   Target University
                 </label>
                 <select
                   value={universityId}
                   onChange={(e) => setUniversityId(e.target.value)}
-                  className="w-full text-sm font-semibold bg-transparent text-slate-800 focus:outline-none cursor-pointer"
+                  className="w-full text-sm font-semibold bg-transparent text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer"
                 >
-                  <option value="">Any University</option>
+                  <option value="" className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">Any University</option>
                   {meta?.universities?.map((u) => (
-                    <option key={u.id} value={u.id}>
+                    <option key={u.id} value={u.id} className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">
                       {u.name} ({u.city})
                     </option>
                   ))}
@@ -111,28 +111,28 @@ export default function HomePage() {
               </div>
 
               {/* Room Type */}
-              <div className="w-full md:flex-1 p-2 rounded-xl hover:bg-slate-50 transition border border-transparent md:border-r md:border-slate-100">
+              <div className="w-full md:flex-1 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition border border-transparent md:border-r md:border-slate-100 dark:md:border-slate-800">
                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <Bed className="w-3.5 h-3.5 text-teal-600" />
+                  <Bed className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   Room Type
                 </label>
                 <select
                   value={roomType}
                   onChange={(e) => setRoomType(e.target.value)}
-                  className="w-full text-sm font-semibold bg-transparent text-slate-800 focus:outline-none cursor-pointer"
+                  className="w-full text-sm font-semibold bg-transparent text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer"
                 >
-                  <option value="">All Accommodation Types</option>
-                  <option value="private">Private Room</option>
-                  <option value="studio">Studio Flat</option>
-                  <option value="shared">Shared Room</option>
-                  <option value="entire_flat">Entire Apartment</option>
+                  <option value="" className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">All Accommodation Types</option>
+                  <option value="private" className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">Private Room</option>
+                  <option value="studio" className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">Studio Flat</option>
+                  <option value="shared" className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">Shared Room</option>
+                  <option value="entire_flat" className="text-slate-800 dark:text-slate-100 dark:bg-slate-900">Entire Apartment</option>
                 </select>
               </div>
 
               {/* Max Budget */}
-              <div className="w-full md:w-48 p-2 rounded-xl hover:bg-slate-50 transition">
+              <div className="w-full md:w-48 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <DollarSign className="w-3.5 h-3.5 text-teal-600" />
+                  <DollarSign className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   Max Budget
                 </label>
                 <input
@@ -140,14 +140,14 @@ export default function HomePage() {
                   placeholder="e.g. $500/mo"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full text-sm font-semibold bg-transparent text-slate-800 placeholder-slate-400 focus:outline-none"
+                  className="w-full text-sm font-semibold bg-transparent text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none"
                 />
               </div>
 
               {/* Search Submit Button */}
               <button
                 type="submit"
-                className="w-full md:w-auto px-8 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl sm:rounded-2xl shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 transition shrink-0"
+                className="w-full md:w-auto px-8 py-3.5 bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white font-bold rounded-xl sm:rounded-2xl shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 transition shrink-0"
               >
                 <Search className="w-4 h-4" />
                 <span>Search Housing</span>
@@ -181,20 +181,20 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-full border border-teal-100 dark:border-teal-800">
               Hand-picked
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">
               Featured Accommodations
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Top-rated listings closest to major campus lecture halls and student hubs.
             </p>
           </div>
 
           <Link
             to="/properties"
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-teal-600 hover:text-teal-700 transition group"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition group"
           >
             Explore all listings
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -204,7 +204,7 @@ export default function HomePage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-80 bg-slate-200 animate-pulse rounded-2xl"></div>
+              <div key={i} className="h-80 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div>
             ))}
           </div>
         ) : (
@@ -218,61 +218,61 @@ export default function HomePage() {
 
       {/* Quick Category Discovery Pills */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-50 rounded-3xl p-8 sm:p-12 border border-slate-200/80">
-          <h3 className="text-xl sm:text-2xl font-black text-slate-900 text-center mb-8">
+        <div className="bg-slate-50 dark:bg-slate-900/60 rounded-3xl p-8 sm:p-12 border border-slate-200/80 dark:border-slate-800">
+          <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white text-center mb-8">
             Explore Housing By Preference
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link
               to="/properties?room_types=private"
-              className="p-5 bg-white rounded-2xl border border-slate-200/70 hover:border-teal-400 hover:shadow-md transition flex items-center gap-4 group"
+              className="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-md transition flex items-center gap-4 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition">
+              <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold group-hover:bg-teal-600 group-hover:text-white transition">
                 <Bed className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">Private En-suite</h4>
-                <p className="text-xs text-slate-500">Quiet study rooms</p>
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Private En-suite</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Quiet study rooms</p>
               </div>
             </Link>
 
             <Link
               to="/properties?room_types=studio"
-              className="p-5 bg-white rounded-2xl border border-slate-200/70 hover:border-teal-400 hover:shadow-md transition flex items-center gap-4 group"
+              className="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-md transition flex items-center gap-4 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition">
                 <Building className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">Studio Apartments</h4>
-                <p className="text-xs text-slate-500">Self-contained living</p>
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Studio Apartments</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Self-contained living</p>
               </div>
             </Link>
 
             <Link
               to="/properties?bills_included=true"
-              className="p-5 bg-white rounded-2xl border border-slate-200/70 hover:border-teal-400 hover:shadow-md transition flex items-center gap-4 group"
+              className="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-md transition flex items-center gap-4 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold group-hover:bg-amber-600 group-hover:text-white transition">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold group-hover:bg-amber-600 group-hover:text-white transition">
                 <Zap className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">Bills Included</h4>
-                <p className="text-xs text-slate-500">No hidden utility bills</p>
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Bills Included</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400">No hidden utility bills</p>
               </div>
             </Link>
 
             <Link
               to="/properties?max_distance=1"
-              className="p-5 bg-white rounded-2xl border border-slate-200/70 hover:border-teal-400 hover:shadow-md transition flex items-center gap-4 group"
+              className="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-md transition flex items-center gap-4 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold group-hover:bg-purple-600 group-hover:text-white transition">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold group-hover:bg-purple-600 group-hover:text-white transition">
                 <MapPin className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">&lt; 1km to Campus</h4>
-                <p className="text-xs text-slate-500">Walkable in minutes</p>
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">&lt; 1km to Campus</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Walkable in minutes</p>
               </div>
             </Link>
           </div>
@@ -283,7 +283,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Student Card */}
-          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-blue-900 to-indigo-950 text-white relative overflow-hidden">
+          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-blue-900 to-indigo-950 text-white relative overflow-hidden border border-blue-800/40">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-300 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-400/30">
               For Students
             </span>
@@ -315,7 +315,7 @@ export default function HomePage() {
           </div>
 
           {/* Landlord Card */}
-          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-teal-900 to-emerald-950 text-white relative overflow-hidden">
+          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-teal-900 to-emerald-950 text-white relative overflow-hidden border border-teal-800/40">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-400/30">
               For Landlords & Property Managers
             </span>
@@ -350,4 +350,3 @@ export default function HomePage() {
     </div>
   );
 }
-

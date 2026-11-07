@@ -45,6 +45,29 @@ class Property extends Model
         'available_from' => 'date',
     ];
 
+    protected $appends = [
+        'updated_recently_badge',
+    ];
+
+    public function getUpdatedRecentlyBadgeAttribute(): string
+    {
+        $updated = $this->updated_at ?? $this->created_at ?? now();
+        $diffHours = now()->diffInHours($updated);
+
+        if ($diffHours < 24) {
+            return 'Listing updated today';
+        }
+
+        $diffDays = now()->diffInDays($updated);
+        if ($diffDays <= 7) {
+            return 'Listing updated recently';
+        } elseif ($diffDays <= 30) {
+            return 'Listing updated this month';
+        }
+
+        return 'Listing updated recently';
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -29,6 +29,7 @@ class AuthController extends Controller
             'role' => $validated['role'],
             'phone' => $validated['phone'] ?? null,
             'company_name' => $validated['company_name'] ?? null,
+            'last_seen_at' => now(),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -68,10 +69,11 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
+        $user->update(['last_seen_at' => now()]);
 
         return response()->json([
             'message' => 'Logged in successfully',
-            'user' => $user,
+            'user' => $user->fresh(),
             'token' => $token,
         ]);
     }
@@ -91,10 +93,11 @@ class AuthController extends Controller
 
         // Delete old demo tokens if needed, then create fresh one
         $token = $user->createToken('demo_token')->plainTextToken;
+        $user->update(['last_seen_at' => now()]);
 
         return response()->json([
             'message' => 'Demo login successful as ' . ucfirst($role),
-            'user' => $user,
+            'user' => $user->fresh(),
             'token' => $token,
         ]);
     }
@@ -103,6 +106,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
         if ($user) {
+            $user->update(['last_seen_at' => now()]);
             $user->loadCount(['properties', 'receivedInquiries', 'sentInquiries', 'savedProperties']);
         }
 
